@@ -70,7 +70,11 @@ function AdminUsersContent() {
   const filteredUsers = users.filter(user => 
     (user.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) || 
     (user.email?.toLowerCase() || '').includes(searchTerm.toLowerCase())
-  ).map(user => ({ ...user, stats: calculateProgressMetrics(user.projects) }));
+  ).map(user => ({ ...user, stats: calculateProgressMetrics(user.projects) })).sort((a, b) => {
+	  let percent = b.stats.totalPercentage - a.stats.totalPercentage;
+	  let viral = +!!b.projects.find(x=>x.viral) - +!!a.projects.find(x=>x.viral);
+	  return percent === 0 ? viral : percent;
+  });
 
   // Function to render status badge
   const getUserStatusBadge = (userStatus: UserStatus) => {
@@ -120,7 +124,7 @@ function AdminUsersContent() {
     
     return (
       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${bgColor} ${textColor}`}>
-        {user.stats.totalPercentage.toFixed(0)}%{label.length ? " - " + label : ""}
+        {user.stats.totalPercentage.toFixed(1)}%{label.length ? " - " + label : ""}
       </span>
     );
   };
